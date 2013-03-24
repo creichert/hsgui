@@ -1,0 +1,19 @@
+Name:           gui
+Version:        0.1
+Description:    Basic Gui Template Project in Haskell
+License:        BSD3
+License-File:   LICENSE
+Author:         Christopher Reichert
+Maintainer:     creichert07@gmail.com
+Build-Type:     Simple
+Cabal-Version:  >=1.2
+
+Data-Files:     ui/gui.glade
+
+Extra-Source-Files: README.md
+
+Executable gui
+    Main-is:        Main.hs
+    hs-source-dirs: src
+    Build-Depends:  base, directory, gtk
+
