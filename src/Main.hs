@@ -1,16 +1,20 @@
 {-# LANGUAGE PatternGuards #-}
 -----------------------------------------------------------------------------
 -- |
--- module      :  main
--- copyright   :
--- license     :
+-- module      :  Graphics.Engine
+-- copyright   :  (c) Christpher Reichert <creichert07@gmail.com>
+-- license     :  BSD3
 --
 -- maintainer  :  creichert07@gmail.com
 -- stability   :  unstable
 -- portability :  portable
 --
 -----------------------------------------------------------------------------
-module Main (main) where
+module Main (
+    -- * main function.
+    main
+  , mainuistr
+) where
 
 import Data.List (nub)
 
@@ -21,51 +25,49 @@ import System.Console.GetOpt
 
 import qualified Graphics.UI.MainUI as UI
 
+import Paths_hsgame
 
 data Flag = Help
           | N Int
   deriving Eq
 
+-- | Temporary place to put this string.
+mainuistr :: String
+mainuistr = "ui/gameui.glade"
 
-mainui :: String
-mainui = "ui/gui.glade"
-
-
+-- | main
 main :: IO ()
-main = do (files, k) <- parseArgs -- files is a list of files, k is from -n
+main = do (_, _) <- parseArgs -- return ([String], Int), (files, l)
+          -- Open and show main ui
+          UI.loadUI mainuistr
 
-          -- Open the main ui
-          UI.loadUI mainui
-          putStrLn "Here"
-
-
+-- | Usage String
 usage :: String
-usage = "Usage: gui [-h] [-n n] [file ...]"
+usage = "Usage: game [-h] [-n n] [file ...]"
 
-
+-- | Command line options definition.
 options :: [OptDescr Flag]
 options = [ Option ['h'] ["help"] (NoArg Help)
-                   "Help!",
+                   "Show this help message",
             Option ['n'] []       (ReqArg (\s -> N (read s)) "N")
                    "Number (default 1)" ]
 
-
--- | This function was copied from the "Real World Haskell" getOpt
--- example.
+-- | Parse args from stdin and handle accordingly.
+--
 parseArgs :: IO ([String], Int)
 parseArgs = do
-    argv <- getArgs
-    case parse argv of
-        ([], files, [])                     -> return (nub files, 0)
-        (opts, files, [])
-            | Help `elem` opts              -> help
-            | [N n] <- filter (/=Help) opts -> return (nub files, n)
-        (_,_,errs)                          -> die errs
-  where
-    parse argv = getOpt Permute options argv
-    header     = usage
-    info       = usageInfo header options
-    dump       = hPutStrLn stderr
-    die errs   = dump (concat errs ++ info) >> exitWith (ExitFailure 1)
-    help       = dump info                  >> exitWith ExitSuccess
+      argv <- getArgs
+      case parse argv of
+          ([], files, [])                     -> return (nub files, 0)
+          (opts, files, [])
+              | Help `elem` opts              -> help
+              | [N n] <- filter (/=Help) opts -> return (nub files, n)
+          (_,_,errs)                          -> die errs
+    where
+      parse argv = getOpt Permute options argv
+      header     = usage
+      info       = usageInfo header options
+      dump       = hPutStrLn stderr
+      die errs   = dump (concat errs ++ info) >> exitWith (ExitFailure 1)
+      help       = dump info                  >> exitWith ExitSuccess
 
